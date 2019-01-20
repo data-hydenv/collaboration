@@ -12,6 +12,7 @@ library(RPostgreSQL)
 library(knitr)
 library(dplyr)
 library(ggplot2)
+library(assertthat)
 
 # create connection to DB with cmd args
 drv = dbDriver('PostgreSQL')
@@ -45,11 +46,16 @@ group by hobo_id, radiation_influence, longitude, latitude
 ```{r}
 kable(hobos.2019, caption='All of 2019\'s HOBO locations')
 ```
+```{r, include=FALSE}
+# test that everything was downloaded
+assert_that(length(hobos.2019), 37)
+```
 
 
 Long explanatory text why we are doing this:
 
 ```{r}
+knitr::opts_chunk$set(echo = TRUE)
 hobos.2019 %>%
   ggplot(aes(x=longitude, y=latitude)) +
   geom_point()
