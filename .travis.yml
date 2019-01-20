@@ -1,0 +1,19 @@
+sudo: false
+language: r
+cache: packages
+r_packages:
+  - rmarkdown
+  - ggplot2
+  - dplyr
+  - RPostgresQL
+  
+script:
+  - R -e "rmarkdown::render('analysis.Rmd', output_file='index.html')" --args "$DBUSER" "$DBPASSWORD"
+  
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github_token: $GITHUB_TOKEN
+  file: index.html
+  on:
+    branch: master
