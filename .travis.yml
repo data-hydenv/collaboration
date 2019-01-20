@@ -1,12 +1,10 @@
 sudo: false
 language: r
 cache: packages
-r_packages:
-  - rmarkdown
-  - ggplot2
-  - dplyr
-  - RPostgresQL
   
+install:
+  - R -e "install.packages('rmarkdown')"
+  - R -e "install.packages('RPostgreSQL')"
 script:
   - R -e "rmarkdown::render('analysis.Rmd', output_file='index.html')" --args "$DBUSER" "$DBPASSWORD"
   
