@@ -1,0 +1,79 @@
+---
+title: "2019 Data Course"
+author: "Mirko Maelicke"
+date: "20 1 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(RPostgreSQL)
+library(knitr)
+library(dplyr)
+library(ggplot2)
+
+# create connection to DB with cmd args
+drv = dbDriver('PostgreSQL')
+con <- dbConnect(drv, host='v45522.1blu.de', port=5432, 
+                 user=commandArgs(trailingOnly = T)[1], password= commandArgs(trailingOnly = T)[2],
+                 dbname='datamanagement')
+```
+
+# 2019 Data overview
+
+The following table summarizes all sensor locations used in 2019:
+
+```{sql connection=con, output.var='hobos.2019'}
+select hobo_id, radiation_influence, longitude, latitude,
+  avg(min_t) as mean_t
+from
+(
+  select
+    h.hobo_id, h.radiation_influence, st_x(h.geom) as longitude, st_y(h.geom) as latitude,
+    date_trunc('hour', d.tstamp) as hour,
+    max(d.temperature) as min_t
+  from hobo h
+  join raw_data d on d.hobo_id=h.hobo_id
+  where h.year=2019 and d.tstamp > '2018-12-24' and d.tstamp < '2019-01-07'
+  and st_y(h.geom) < 48.1
+  and d.light > 250 and d.light < 2500
+  group by h.hobo_id, h.radiation_influence, st_x(h.geom), st_y(h.geom), date_trunc('hour', d.tstamp)
+) as hour
+group by hobo_id, radiation_influence, longitude, latitude
+```
+```{r}
+kable(hobos.2019, caption='All of 2019\'s HOBO locations')
+```
+
+
+Long explanatory text why we are doing this:
+
+```{r}
+hobos.2019 %>%
+  ggplot(aes(x=longitude, y=latitude)) +
+  geom_point()
+```
+
+some violin plot:
+
+```{r}
+hobos.2019 %>%
+  ggplot(aes(x=radiation_influence, y=mean_t)) +
+  geom_violin()
+```
+
+The good old regression example:
+
+```{r}
+hobos.2019 %>%
+  ggplot(aes(x=radiation_influence, y=mean_t)) + 
+  geom_point()
+```
+
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+dbDisconnect(con)
+```
+

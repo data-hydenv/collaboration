@@ -5,6 +5,8 @@ cache: packages
 install:
   - R -e "install.packages('rmarkdown')"
   - R -e "install.packages('RPostgreSQL')"
+  - R -e "install.packages('dplyr')"
+  - R -e "install.packages('ggplot2')"
 script:
   - R -e "rmarkdown::render('analysis.Rmd', output_file='index.html')" --args "$DBUSER" "$DBPASSWORD"
   
