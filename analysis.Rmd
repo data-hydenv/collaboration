@@ -12,7 +12,9 @@ library(RPostgreSQL)
 library(knitr)
 library(dplyr)
 library(ggplot2)
-library(assertthat)
+
+# load my functions
+source('lib.R')
 
 # create connection to DB with cmd args
 drv = dbDriver('PostgreSQL')
@@ -21,23 +23,29 @@ con <- dbConnect(drv, host='v45522.1blu.de', port=5432,
                  dbname='datamanagement')
 ```
 
-# 2019 Data overview
+## 2019 Data overview
 
+### distribution
+
+This short 'analysis' script shall demonstrate how we can use Github to create automated reports on the collected data in a collaborative way.
 The following table summarizes all sensor locations used in 2019:
 
 ```{sql connection=con, output.var='hobos.2019'}
 select hobo_id, radiation_influence, longitude, latitude,
-  avg(min_t) as mean_t
+  avg(min_t) as min_t, avg(max_t) as max_t, avg(mean_t) as mean_t, avg(p90_t) as p90_t
 from
 (
   select
     h.hobo_id, h.radiation_influence, st_x(h.geom) as longitude, st_y(h.geom) as latitude,
     date_trunc('hour', d.tstamp) as hour,
-    max(d.temperature) as min_t
+    max(d.temperature) as max_t,
+    min(d.temperature) as min_t,
+    avg(d.temperature) as mean_t,
+    percentile_cont(0.9) within group (order by d.temperature) as p90_t
   from hobo h
   join raw_data d on d.hobo_id=h.hobo_id
   where h.year=2019 and d.tstamp > '2018-12-24' and d.tstamp < '2019-01-07'
-  and st_y(h.geom) < 48.1
+  and st_y(h.geom) < 48.1 and st_x(h.geom) > 7.8
   and d.light > 250 and d.light < 2500
   group by h.hobo_id, h.radiation_influence, st_x(h.geom), st_y(h.geom), date_trunc('hour', d.tstamp)
 ) as hour
@@ -46,14 +54,14 @@ group by hobo_id, radiation_influence, longitude, latitude
 ```{r}
 kable(hobos.2019, caption='All of 2019\'s HOBO locations')
 ```
-```{r, include=FALSE}
-# test that everything was downloaded
-assert_that(length(hobos.2019), 37)
-```
 
+The database is searched on compile time of this RMarkdown file. Check the source for the corresponding SQL code. 
+As you can see, there is no username or password hardcoded into the file. We use *environment variables* for passing in this information.
+The calculated indices are the mean of **hourly** minimum, maximum, mean and 90% percentile temperature, aggregated live on query. 
+Remember, that the database stores 5-min data. We do also exclude the first few days and the last day of the campaign and limit the used temperatures to a 
+recorded light intensity range of 250 < light < 2500.
 
-Long explanatory text why we are doing this:
-
+An overview over all used locations and their spatial distribution is given below:
 ```{r}
 knitr::opts_chunk$set(echo = TRUE)
 hobos.2019 %>%
@@ -61,7 +69,7 @@ hobos.2019 %>%
   geom_point()
 ```
 
-some violin plot:
+Let's group by radiation_influence and have a look at the mean temperatures:
 
 ```{r}
 hobos.2019 %>%
@@ -69,13 +77,15 @@ hobos.2019 %>%
   geom_violin()
 ```
 
-The good old regression example:
+## analysis
 
+Before you continue with in-depth analysis, or run a violin/boxplot on each index value, let's look at the correlations between the indices:
 ```{r}
-hobos.2019 %>%
-  ggplot(aes(x=radiation_influence, y=mean_t)) + 
-  geom_point()
+correlation(hobos.2019)
 ```
+
+
+
 
 
 ```{r, include=FALSE}
