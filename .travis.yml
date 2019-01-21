@@ -7,8 +7,10 @@ install:
   - R -e "install.packages('RPostgreSQL')"
   - R -e "install.packages('dplyr')"
   - R -e "install.packages('ggplot2')"
+  - R -e "install.packages('covr')"
 script:
   - R -e "rmarkdown::render('analysis.Rmd', output_file='index.html')" --args "$DBUSER" "$DBPASSWORD"
+  - R -e "library(covr);codecov()"
   
 deploy:
   provider: pages
