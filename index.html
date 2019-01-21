@@ -757,6 +757,19 @@ $(document).ready(function () {
 ## max_t     -0.16  0.95  1.00   0.99  1.00
 ## mean_t    -0.17  0.98  0.99   1.00  0.99
 ## p90_t     -0.16  0.96  1.00   0.99  1.00</code></pre>
+<p>Looks like the there is a high correlation between the average hourly minimum and average hourly mean temperature. Let’s verify this by a T-Test.</p>
+<pre class="r"><code>t.test(hobos.2019$min_t, hobos.2019$mean_t, paired = T)</code></pre>
+<pre><code>## 
+##  Paired t-test
+## 
+## data:  hobos.2019$min_t and hobos.2019$mean_t
+## t = -11.411, df = 33, p-value = 5.38e-13
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.2286325 -0.1594397
+## sample estimates:
+## mean of the differences 
+##              -0.1940361</code></pre>
 </div>
 
 
