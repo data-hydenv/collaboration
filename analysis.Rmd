@@ -84,7 +84,10 @@ Before you continue with in-depth analysis, or run a violin/boxplot on each inde
 correlation(hobos.2019)
 ```
 
-
+Looks like the there is a high correlation between the average hourly minimum and average hourly mean temperature. Let's verify this by a T-Test.
+```{r}
+t.test(hobos.2019$min_t, hobos.2019$mean_t, paired = T)
+```
 
 
 
