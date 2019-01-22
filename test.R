@@ -11,5 +11,5 @@ data <- iris
 names(data) <- c('a', 'b', 'c', 'longitude', 'latitude')
 
 # test 1: cols get omitted
-#res <- correlation(data)
-#assert_that(all(names(res)==c('a', 'b', 'c')))
+res <- correlation(data)
+assert_that(all(names(res)==c('a', 'b', 'c')))
