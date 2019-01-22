@@ -10,3 +10,4 @@ This repository shall demonstrate, how you can utilize Github to foster collabor
 * continous integration
 * publishing (just one more possiblity on top of what you already know)
 
+https://data-hydenv.github.io/collaboration/
