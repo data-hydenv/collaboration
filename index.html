@@ -751,12 +751,11 @@ $(document).ready(function () {
 <h2>analysis</h2>
 <p>Before you continue with in-depth analysis, or run a violin/boxplot on each index value, let’s look at the correlations between the indices:</p>
 <pre class="r"><code>correlation(hobos.2019)</code></pre>
-<pre><code>##         hobo_id min_t max_t mean_t p90_t
-## hobo_id    1.00 -0.18 -0.16  -0.17 -0.16
-## min_t     -0.18  1.00  0.95   0.98  0.96
-## max_t     -0.16  0.95  1.00   0.99  1.00
-## mean_t    -0.17  0.98  0.99   1.00  0.99
-## p90_t     -0.16  0.96  1.00   0.99  1.00</code></pre>
+<pre><code>##        min_t max_t mean_t p90_t
+## min_t   1.00  0.95   0.98  0.96
+## max_t   0.95  1.00   0.99  1.00
+## mean_t  0.98  0.99   1.00  0.99
+## p90_t   0.96  1.00   0.99  1.00</code></pre>
 <p>Looks like the there is a high correlation between the average hourly minimum and average hourly mean temperature. Let’s verify this by a T-Test.</p>
 <pre class="r"><code>t.test(hobos.2019$min_t, hobos.2019$mean_t, paired = T)</code></pre>
 <pre><code>## 

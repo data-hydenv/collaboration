@@ -5,7 +5,7 @@ dummy <- function(a, b) {
 
 correlation <- function(data) {
   # remove some columns
-  use_cols <- names(data) %in% c("radiation_influence", "longitude", "latitude")
+  use_cols <- names(data) %in% c("hobo_id", "radiation_influence", "longitude", "latitude")
   corr_data <- data[!use_cols]
   corr_mat <- cor(corr_data, method='pearson')
   rounded_corr_mat <- round(corr_mat, 2)
