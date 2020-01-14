@@ -11,3 +11,6 @@ correlation <- function(data) {
   rounded_corr_mat <- round(corr_mat, 2)
   return(rounded_corr_mat)
 }
+ dummy2 <- function(a) {
+   returns(a)
+}
